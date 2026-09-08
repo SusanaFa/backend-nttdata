@@ -1,21 +1,21 @@
 # backend-nttdata
 
-Backend desarrollado en Java con Spring Boot y Spring Data JPA para la consulta de personas almacenadas en una base de datos MySQL.
+Backend desarrollado en **Java** con **Spring Boot** y **Spring Data JPA** para la consulta de personas almacenadas en una base de datos **MySQL**.
 
-Actualmente la API permite buscar una persona mediante su RUT.
-
+Actualmente la API permite consultar información de personas mediante su RUT.
+---
 ## Tecnologías
-
-- Java 25
+- Java 17
 - Spring Boot 4.0.8
 - Spring Web MVC
 - Spring Data JPA
 - Hibernate
 - MySQL
+- Railway
 - MySQL Connector/J
 - Lombok
 - Maven
-- Maven Wrapper
+---
 
 ## Estructura del proyecto
 
@@ -44,6 +44,7 @@ backend-nttdata/
 ├── mvnw.cmd
 └── pom.xml
 ```
+---
 
 ## Arquitectura
 
@@ -60,9 +61,9 @@ Repository
      ↓
 Spring Data JPA / Hibernate
      ↓
-MySQL
+MySQL(Railway)
 ```
-
+---
 ### Model
 
 `Persona` representa la entidad persistida en la tabla `personas`.
@@ -94,32 +95,10 @@ Esto permite utilizar las operaciones proporcionadas por Spring Data JPA para ac
 
 `PersonaController` expone el endpoint HTTP de consulta de personas.
 
-## Base de datos
+### Base de Datos
 
-El proyecto utiliza MySQL y espera una base de datos llamada:
-
-```text
-personas_db
-```
-
-La configuración actual utiliza por defecto:
-
-```text
-Host: localhost
-Puerto: 3306
-Usuario: root
-Base de datos: personas_db
-```
-
-### Crear la base de datos
-
-Antes de ejecutar la aplicación se debe crear la base de datos en MySQL:
-
-```sql
-CREATE DATABASE personas_db
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-```
+La aplicación utiliza una base de datos **MySQL alojada en Railway**.
+Hibernate está configurado para crear y actualizar automáticamente la estructura de la base de datos:
 
 Durante el desarrollo, Hibernate está configurado con:
 
@@ -127,7 +106,7 @@ Durante el desarrollo, Hibernate está configurado con:
 spring.jpa.hibernate.ddl-auto=update
 ```
 
-Esto permite que Hibernate cree o actualice la tabla correspondiente a la entidad `Persona` al iniciar la aplicación.
+Al iniciar la aplicación, Hibernate crea automáticamente la tabla correspondiente a la entidad `Persona` si ésta no existe.
 
 ## Configuración de MySQL
 
@@ -140,74 +119,55 @@ src/main/resources/application.properties
 Actualmente contiene:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/personas_db?useSSL=false&serverTimezone=UTC
+spring.application.name=personas
+
+spring.datasource.url=jdbc:mysql://altaria.proxy.rlwy.net:13282/railway
 spring.datasource.username=root
-spring.datasource.password=TU_PASSWORD
+spring.datasource.password=uqYBrMgrIVMJSUXvCjuWiieglYOBtlop
+
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
+
+server.port=8083
 ```
-
-Antes de ejecutar el proyecto localmente, cada integrante debe configurar la contraseña correspondiente a su instalación de MySQL.
-
-> **Importante:** no se deben subir credenciales reales al repositorio. Si se modifica localmente `application.properties` para ejecutar el proyecto, se debe evitar incluir la contraseña personal en un commit.
+---
 
 ## Ejecutar el proyecto
-
 ### Requisitos
 
-- Java 25
-- MySQL
+- Java 17
 - Git
 
-No es necesario instalar Maven globalmente, ya que el proyecto incluye Maven Wrapper.
+No es necesario instalar MySQL localmente, ya que la aplicación utiliza una base de datos remota en Railway.
 
-### 1. Clonar el repositorio
+## Clonar el repositorio
 
 ```bash
 git clone https://github.com/SusanaFa/backend-nttdata.git
 cd backend-nttdata
 ```
 
-### 2. Crear la base de datos
+## Ejecutar
 
-Ejecutar en MySQL Workbench o desde la consola de MySQL:
-
-```sql
-CREATE DATABASE personas_db
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-```
-
-### 3. Configurar la conexión
-
-Editar localmente:
-
-```text
-src/main/resources/application.properties
-```
-
-y reemplazar `TU_PASSWORD` por la contraseña correspondiente al usuario local de MySQL.
-
-### 4. Ejecutar la aplicación
-
-En Windows:
+### Windows
 
 ```bash
 mvnw.cmd spring-boot:run
 ```
 
-En Linux o macOS:
+### Linux / macOS
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Por defecto, Spring Boot inicia la aplicación en:
+Por defecto la aplicación puede ejecutarse en:
 
 ```text
-http://localhost:8080
+http://localhost:8083
 ```
 
 ## API
@@ -223,7 +183,7 @@ El RUT se envía como query parameter mediante `rut`.
 Ejemplo:
 
 ```http
-GET http://localhost:8080/persona/v1/find?rut=12345678-9
+GET http://localhost:8083/persona/v1/find?rut=12345678-9
 ```
 
 Si existe una persona con el RUT solicitado, la API retorna sus datos.
@@ -247,7 +207,7 @@ Crear una petición con:
 
 ```text
 Método: GET
-URL: http://localhost:8080/persona/v1/find
+URL: http://localhost:8083/persona/v1/find
 ```
 
 Agregar el siguiente Query Param:
@@ -260,7 +220,7 @@ VALUE: RUT_DE_LA_PERSONA
 Ejemplo:
 
 ```text
-http://localhost:8080/persona/v1/find?rut=12345678-9
+http://localhost:8083/persona/v1/find?rut=12345678-9
 ```
 
 Para obtener un resultado, debe existir previamente una persona registrada en la tabla `personas` de la base de datos.
@@ -287,29 +247,32 @@ mvnw.cmd test
 
 Actualmente el backend implementa:
 
-- Conexión con MySQL.
+- Conexión a MySQL.
+- Base de datos remota en Railway.
 - Persistencia mediante Spring Data JPA.
+- Hibernate para gestión de entidades.
 - Entidad `Persona`.
 - Repository para acceso a datos.
 - Service para búsqueda por RUT.
-- Endpoint REST para consulta por RUT.
-- Configuración de Hibernate para desarrollo.
-- Test básico de carga del contexto de Spring Boot.
-
+- Endpoint REST para consulta de personas.
+- Creación automática de tablas mediante Hibernate.
+- Integración con GitHub.
+- Preparación para despliegue en Azure App Service.
+ 
 El proyecto se encuentra en desarrollo y podrá incorporar nuevos endpoints y funcionalidades a medida que avance la implementación.
 
-## Participantes
+### Participantes
 
-| Participante |
-| --- |
-| [Eynier Cordova Serra](https://github.com/blackwolf62) |
-| Darío Illanes Tapia |
-| Francisco Javier Moraga |
-| [Liliana Cedeño](https://github.com/LilianaCedeno) |
-| Romina Gutiérrez |
-| [Pablo Francisco Igor](https://github.com/pableteih) |
-| [Susana Farías Vera](https://github.com/SusanaFa) |
-| [Angelo López Quintana](https://github.com/lord-angelo) |
+| Participante | GitHub |
+|-------------|--------|
+| Eynier Cordova Serra | [@blackwolf62](https://github.com/blackwolf62) |
+| Darío Illanes Tapia | - |
+| Francisco Javier Moraga | - |
+| Liliana Cedeño | [@LilianaCedeno](https://github.com/LilianaCedeno) |
+| Romina Gutiérrez | - |
+| Pablo Francisco Igor | [@pableteih](https://github.com/pableteih) |
+| Susana Farías Vera | [@SusanaFa](https://github.com/SusanaFa) |
+| Angelo López Quintana | [@lord-angelo](https://github.com/lord-angelo) |
 
 ## Repositorio
 
