@@ -302,14 +302,14 @@ El proyecto se encuentra en desarrollo y podrá incorporar nuevos endpoints y fu
 
 | Participante |
 | --- |
-| Eynier Cordova Serra |
+| [Eynier Cordova Serra](https://github.com/blackwolf62) |
 | Darío Illanes Tapia |
 | Francisco Javier Moraga |
 | [Liliana Cedeño](https://github.com/LilianaCedeno) |
 | Romina Gutiérrez |
-| Pablo Francisco Igor |
+| [Pablo Francisco Igor](https://github.com/pableteih) |
 | [Susana Farías Vera](https://github.com/SusanaFa) |
-| Angelo López Quintana |
+| [Angelo López Quintana](https://github.com/lord-angelo) |
 
 ## Repositorio
 
